@@ -9,6 +9,7 @@
 
 void handleInvite(Server &server, Client &client, std::vector<std::string> &params)
 {
+    (void)server, (void)client, (void)params;
     // [YOU] 1. Check registered
     // [YOU] 2. Check params has 2 elements: nick + #channel (ERR_NEEDMOREPARAMS)
     // [YOU] 3. Find channel → ERR_NOSUCHCHANNEL if missing

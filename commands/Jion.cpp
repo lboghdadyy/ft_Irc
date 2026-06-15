@@ -11,6 +11,7 @@
 // params[1] = "key" (optional, for +k mode)
 void handleJoin(Server &server, Client &client, std::vector<std::string> &params)
 {
+    (void)server, (void)client, (void)params;
     // [YOU] 1. Check client is registered
     // [YOU] 2. Check params not empty (ERR_NEEDMOREPARAMS)
     // [YOU] 3. Validate channel name starts with '#'

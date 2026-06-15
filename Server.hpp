@@ -1,6 +1,8 @@
 #ifndef SERVER_HPP
 # define SERVER_HPP
 
+# include <vector>
+# include <iostream>
 # include "Client.hpp"
 # include "Channel.hpp"
 
