@@ -51,6 +51,7 @@ Server::Server(std::string p, std::string s)
         int n = epoll_wait(epollFd, evs.data(), 16, 420);
         if (n < 0)
         {
+            if (errno == EINTR)
             std::cerr<<"epoll_wait failed\n";
             break;
         }
@@ -63,7 +64,7 @@ Server::Server(std::string p, std::string s)
                 if (revs & EPOLLIN)
                     AccClient();
             }
-            else if (revs & (EPOLLOUT | EPOLLERR))
+            else if (revs & (EPOLLHUP | EPOLLERR))
                 rmvClient(fd);
             else
             {
@@ -74,12 +75,18 @@ Server::Server(std::string p, std::string s)
             }
         }
         if (n == (int)evs.size())
-        {
             evs.resize(evs.size() * 2);
-            continue ;
-        }
     }
     std::cout<<"irc server shariott shutting down\n";
+}
+
+void   Server::sendToClient(int fd, std::string msg)
+{
+    std::map<int, Client>::iterator i = cls.find(fd);
+    if (i == cls.end())
+        return;
+    i->second.getsend() += msg;
+    clearEpoll(fd, true);
 }
 
 void    Server::AccClient()

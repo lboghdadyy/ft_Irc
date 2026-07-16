@@ -58,6 +58,7 @@ class Server
         void    clientread(int fd);
         void    clientwrite(int fd);
         void    clearEpoll(int fd, bool x);
+        void    sendToClient(int fd, std::string msg);
         void    pars(int fd);
         ~Server();
 };
