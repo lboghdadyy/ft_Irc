@@ -18,6 +18,9 @@
 #include <errno.h>
 #include <map>
 
+class Channel;
+// # include "channels.hpp"
+
 class Client
 {
     private :
@@ -25,6 +28,7 @@ class Client
         std::string ip;
         std::string recv;
         std::string send;
+        std::string nick; //
     public :
         Client();
         Client(int f, std::string i);
@@ -32,6 +36,7 @@ class Client
         Client& operator=(const Client &x);
         int getfd();
         std::string& getrecv();
+        std::string& getNick(); // 
         std::string& getsend();
         std::string& getip();
         ~Client();
@@ -59,6 +64,13 @@ class Server
         void    clientwrite(int fd);
         void    clearEpoll(int fd, bool x);
         void    sendToClient(int fd, std::string msg);
+        // what i add to Channels and my command parts
+        void    handleCommand(int fd, std::string line);
+        void    cmdJoin(int fd, std::vector<std::string> &params);
+        void    cmdInvite(int fd, std::vector<std::string> &params);
+        void    cmdKick(int fd, std::vector<std::string> &params);
+        std::map<std::string, Channel> channels;
+        void    removeFromAllChannels(int fd);
         void    pars(int fd);
         ~Server();
 };

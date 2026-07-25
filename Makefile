@@ -1,24 +1,25 @@
-CPP = c++
+CXX = c++
 
-NAME = irc
+NAME = ircserv
 
-FLAGS = -Wall -Wextra -Werror -std=c++98 
+CXXFLAGS = -Wall -Wextra -Werror -std=c++98 
 
 RM = rm -rf
 
-SRC = srcs/main.cpp srcs/server.cpp srcs/client.cpp
+SRC = main.cpp srcs/server.cpp srcs/client.cpp srcs/channels.cpp \
+	srcs/commands/Commands.cpp srcs/commands/join.cpp srcs/commands/kick.cpp srcs/commands/invite.cpp
 
-HEADER = includes/server.hpp
+HEADER = includes/server.hpp includes/channels.cpp
 
 OBJ = $(SRC:.cpp=.o)
 
 all: $(NAME)
 
 $(NAME): $(OBJ)
-	$(CPP) $(OBJ) -o $(NAME)
+	$(CXX) $(OBJ) -o $(NAME)
 
 %.o: %.cpp $(HEADER)
-	$(CPP) $(FLAGS) -c $< -o $@
+	$(CXX) $(CXXFLAGS) -c $< -o $@
 
 clean:
 	$(RM) $(OBJ)

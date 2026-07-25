@@ -1,4 +1,5 @@
 #include "../includes/server.hpp"
+#include "../includes/channels.hpp"
 
 bool run = true;
 
@@ -180,6 +181,7 @@ void Server::rmvClient(int fd)
         return ;
     std::cout<<"client disconnected\n";
     epoll_ctl(epollFd, EPOLL_CTL_DEL, fd, NULL);
+    removeFromAllChannels(fd);
     close(fd);
     cls.erase(fd);
 }
@@ -211,14 +213,33 @@ void Server::ServSock()
         throw std::runtime_error("epoll_ctl failed\n");
 }
 
-void Server::pars(int fd)
+void Server::removeFromAllChannels(int fd)
 {
+    for (std::map<std::string, Channel>::iterator it = channels.begin(); it != channels.end(); ) {
+        it->second.removeMember(fd);
+        if (it->second.empty())
+            channels.erase(it++);
+        else
+            ++it;
+    }
+}
+
+void Server::pars(int fd) {
     std::map<int, Client>::iterator i = cls.find(fd);
     if (i == cls.end())
         return;
     std::string &buf = i->second.getrecv();
-    //parsing the buf and dispatch the cammands
-    std::cout<<buf;
+    std::cout << buf;
+    size_t pos;
+    while ((pos = buf.find('\n')) != std::string::npos)
+    {
+        std::string line = buf.substr(0, pos);
+        buf.erase(0, pos + 1);
+        if (!line.empty() && line[line.size() - 1] == '\r')
+            line.erase(line.size() - 1);
+        if (!line.empty())
+            handleCommand(fd, line);
+    }
 }
 
 Server::~Server()

@@ -17,6 +17,7 @@ Client& Client::operator=(const Client &x)
         ip = x.ip;
         recv = x.recv;
         send = x.send;
+        nick = x.nick;
     }
     return *this;
 }
@@ -24,6 +25,11 @@ Client& Client::operator=(const Client &x)
 int Client::getfd() { return fd; }
 
 std::string& Client::getip() {return ip; }
+
+std::string& Client::getNick() { // need nickname
+    nick = "UNKNOWN";
+    return nick;
+}
 
 std::string& Client::getrecv() {return recv; }
 
