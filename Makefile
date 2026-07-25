@@ -1,29 +1,30 @@
-NAME = ircserv
-
 CXX = c++
 
-CPPFLAGS = -Wall -Wextra -Werror -std=c++98
+NAME = ircserv
 
-SRC = main.cpp commands/Invite.cpp commands/Jion.cpp commands/Kick.cpp
+CXXFLAGS = -Wall -Wextra -Werror -std=c++98 
 
-INC = Server.hpp Channel.hpp Client.hpp replies.hpp 
+RM = rm -rf
 
-RM = rm -f
+SRC = main.cpp srcs/server.cpp srcs/client.cpp srcs/channels.cpp \
+	srcs/commands/Commands.cpp srcs/commands/join.cpp srcs/commands/kick.cpp srcs/commands/invite.cpp
+
+HEADER = includes/server.hpp includes/channels.cpp
 
 OBJ = $(SRC:.cpp=.o)
 
-all : $(NAME)
+all: $(NAME)
 
-$(NAME) : $(OBJ)
-	$(CXX) $(CPPFLAGS) $(OBJ) -o $(NAME)
+$(NAME): $(OBJ)
+	$(CXX) $(OBJ) -o $(NAME)
 
-%.o : %.cpp $(INC)
-	$(CXX) $(CPPFLAGS) -c $< -o $@
+%.o: %.cpp $(HEADER)
+	$(CXX) $(CXXFLAGS) -c $< -o $@
 
-clean :
+clean:
 	$(RM) $(OBJ)
 
-fclean : clean
+fclean: clean
 	$(RM) $(NAME)
 
 re : fclean all
