@@ -2,13 +2,17 @@
 #include "../../includes/channels.hpp"
 
 void Server::cmdJoin(int fd, std::vector<std::string> &params) {
+    if (!cls[fd].isRegistered())
+        return sendToClient(fd, "451 " + cls[fd].getNick() + " :You have not registered\r\n");
     if (params.empty())
-        return sendToClient(fd, "461 ...ERR_NEEDMOREPARAMS...\n");
+        return sendToClient(fd, "461 " + cls[fd].getNick() + " JOIN :Not enough parameters\r\n");
     std::string channelName = params[0];
     std::string key = (params.size() > 1) ? params[1] : "";
     if (channelName[0] != '#')
-        return sendToClient(fd, "403 ...ERR_NOSUCHCHANNEL...\n");
+        return sendToClient(fd, "403 " + cls[fd].getNick() + " " + channelName + " :No such channel\r\n");
     std::map<std::string, Channel>::iterator it = channels.find(channelName);
+    if (it != channels.end() && it->second.isMember(fd))
+        return ;
     if (it == channels.end()) {
         Channel newChannel(channelName, fd);
         channels.insert(std::make_pair(channelName, newChannel));
@@ -25,7 +29,7 @@ void Server::cmdJoin(int fd, std::vector<std::string> &params) {
         chan.removeInvite(fd);
     }
     Channel &chan = channels.find(channelName)->second;
-    std::string joinMsg = ":" + cls[fd].getNick() + "!" + "user" + "@" + cls[fd].getip() + " JOIN " + channelName + "\r\n";
+    std::string joinMsg = ":" + cls[fd].getNick() + "!user@" + cls[fd].getip() + " JOIN " + channelName + "\r\n";
 
     std::set<int> &members = chan.getMembers();
     for (std::set<int>::iterator m = members.begin(); m != members.end(); ++m)
@@ -37,14 +41,11 @@ void Server::cmdJoin(int fd, std::vector<std::string> &params) {
         sendToClient(fd, "331 " + cls[fd].getNick() + " " + channelName + " :No topic is set\r\n");
 
     std::string names;
-    for (std::set<int>::iterator m = members.begin(); m != members.end(); ++m)
-    {
+    for (std::set<int>::iterator m = members.begin(); m != members.end(); ++m) {
         if (chan.isOperator(*m))
             names += "@";
         names += cls[*m].getNick() + " ";
     }
     sendToClient(fd, "353 " + cls[fd].getNick() + " = " + channelName + " :" + names + "\r\n");
     sendToClient(fd, "366 " + cls[fd].getNick() + " " + channelName + " :End of /NAMES list\r\n");
-
-    std::cout << "JOIN [" << channelName << "][" << key << "]\n";
 }

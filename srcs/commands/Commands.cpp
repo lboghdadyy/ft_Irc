@@ -48,15 +48,12 @@ void Server::handleCommand(int fd, std::string line) {
     std::vector<std::string> params;
     extractParams(rest, params);
     
-    
-    // if (Command == "PASS")
-        // cmdPass(fd, params);
-    // else if(Command == "NICK")
-        // cmdNick(fd, params);
-    // else if(Command == "USER")
-        // cmdUser(fd, params);
-
-
+    if (Command == "PASS")
+        cmdPass(fd, params);
+    else if(Command == "NICK")
+        cmdNick(fd, params);
+    else if(Command == "USER")
+        cmdUser(fd, params);
 
     // else if(Command == "PRIVMSG")
         // cmdPrivmsg(fd, params);
@@ -64,7 +61,6 @@ void Server::handleCommand(int fd, std::string line) {
         // cmdPing(fd, params);
     // else if(Command == "QUIT")
         // cmdQuit(fd, params);
-
     if (Command == "JOIN")
         cmdJoin(fd, params);
     else if (Command == "INVITE")
@@ -80,7 +76,4 @@ void Server::handleCommand(int fd, std::string line) {
     // else
     //     // do nothing for now, or later: send 421 ERR_UNKNOWNCOMMAND
     //     do nothing
-
-
-    (void)fd;
 }

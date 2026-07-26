@@ -213,8 +213,15 @@ void Server::ServSock()
         throw std::runtime_error("epoll_ctl failed\n");
 }
 
-void Server::removeFromAllChannels(int fd)
-{
+int Server::findFdByNick(std::string nick) {
+    for (std::map<int, Client>::iterator i = cls.begin(); i != cls.end(); ++i) {
+        if (i->second.getNick() == nick)
+            return i->first;
+    }
+    return -1;
+}
+
+void Server::removeFromAllChannels(int fd) {
     for (std::map<std::string, Channel>::iterator it = channels.begin(); it != channels.end(); ) {
         it->second.removeMember(fd);
         if (it->second.empty())
