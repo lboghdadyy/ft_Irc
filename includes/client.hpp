@@ -18,19 +18,21 @@
 #include <errno.h>
 #include <map>
 #include <sstream>
+#include <set>
 
 class Client {
     private :
-        int fd;
-        std::string ip;
-        std::string recv;
-        std::string send;
-        std::string nick; //
-        std::string user;
-        std::string realname;
-        bool passOk;
-        bool hasNick;
-        bool hasUser;
+        int                         fd;
+        std::string                 ip;
+        std::string                 recv;
+        std::string                 send;
+        std::string                 nick; //
+        std::string                 user;
+        std::string                 realname;
+        bool                        passOk;
+        bool                        hasNick;
+        bool                        hasUser;
+        std::vector<std::string>    _channels; 
     public :
         Client();
         Client(int f, std::string i);
@@ -54,6 +56,9 @@ class Client {
         void    setHasNick(bool b);
         void    setHasUser(bool b);
         bool    isRegistered() const;
+        void    addChannel(std::string _channelName);
+        void    removechannel(std::string _channelName);
+        std::vector<std::string> &getChannels(void);
 };
 
 #endif

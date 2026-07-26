@@ -37,6 +37,7 @@ void    Server::Check(std::string port, std::string pass)
     pw = pass;
 }
 
+
 Server::Server(std::string p, std::string s)
 {
     Check(p, s);
@@ -219,6 +220,18 @@ int Server::findFdByNick(std::string nick) {
             return i->first;
     }
     return -1;
+}
+
+std::string Server::findNickByfd(int fd) {
+    std::map<int, Client>::iterator i = cls.begin();
+    while (i != cls.end())
+    {
+        if (i->second.getfd() == fd)
+            return (i->second.getNick());
+        i++;
+    }
+    throw (std::runtime_error(""));
+    return ("");
 }
 
 void Server::removeFromAllChannels(int fd) {

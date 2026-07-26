@@ -55,12 +55,12 @@ void Server::handleCommand(int fd, std::string line) {
     else if(Command == "USER")
         cmdUser(fd, params);
 
-    // else if(Command == "PRIVMSG")
-        // cmdPrivmsg(fd, params);
+    else if(Command == "PRIVMSG")
+        cmdPrivmsg(fd, params);
     // else if(Command == "PING")
-        // cmdPing(fd, params);
-    // else if(Command == "QUIT")
-        // cmdQuit(fd, params);
+    //     cmdPing(fd, params);
+    else if(Command == "QUIT")
+        cmdQuit(fd, params);
     if (Command == "JOIN")
         cmdJoin(fd, params);
     else if (Command == "INVITE")
