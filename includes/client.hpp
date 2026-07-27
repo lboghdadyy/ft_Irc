@@ -16,6 +16,7 @@
 #include <stdexcept>
 #include <cstdlib>
 #include <errno.h>
+#include <algorithm>
 #include <map>
 #include <sstream>
 #include <set>
@@ -32,7 +33,6 @@ class Client {
         bool                        passOk;
         bool                        hasNick;
         bool                        hasUser;
-        std::vector<std::string>    _channels; 
     public :
         Client();
         Client(int f, std::string i);
@@ -50,14 +50,12 @@ class Client {
         bool        getPassOk() const;
         bool        getHasNick() const;
         bool        getHasUser() const;
-        void    setUser(std::string u);
-        void    setRealname(std::string r);
-        void    setPassOk(bool b);
-        void    setHasNick(bool b);
-        void    setHasUser(bool b);
-        bool    isRegistered() const;
-        void    addChannel(std::string _channelName);
-        void    removechannel(std::string _channelName);
+        void        setUser(std::string u);
+        void        setRealname(std::string r);
+        void        setPassOk(bool b);
+        void        setHasNick(bool b);
+        void        setHasUser(bool b);
+        bool        isRegistered() const;
         std::vector<std::string> &getChannels(void);
 };
 

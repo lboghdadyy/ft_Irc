@@ -71,7 +71,19 @@ Server::Server(std::string p, std::string s)
             else
             {
                 if (revs & EPOLLIN)
-                    clientread(fd);
+                {
+                    try
+                    {
+                        clientread(fd);
+                    }
+                    catch(const std::exception& e)
+                    {
+                        // if (e.what() == "quit") {
+                            rmvClient(fd);
+                            continue;
+                        // }
+                    }
+                }
                 if (revs & EPOLLOUT)
                     clientwrite(fd);
             }
