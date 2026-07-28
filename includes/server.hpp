@@ -4,6 +4,8 @@
 class Channel;
 // # include "channels.hpp"
 #include "client.hpp"
+#include <string>
+
 
 class Server {
 	private :
@@ -37,6 +39,8 @@ class Server {
 		void	cmdNick(int fd, std::vector<std::string> &params);
 		void	cmdPrivmsg(int fd, std::vector<std::string> &params);
 		void	cmdQuit(int fd, std::vector<std::string> &params);
+		void	cmdTopic(int fd, std::vector<std::string> &params);
+		void    cmdMode(int fd, std::vector<std::string> &params);
 		void	pars(int fd);
 		// int     getClient(const std::string &_nick);
 		std::string						findNickByfd(int fd);

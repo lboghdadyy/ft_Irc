@@ -8,7 +8,7 @@ RM = rm -rf
 
 SRC = main.cpp srcs/server.cpp srcs/client.cpp srcs/channels.cpp \
 	srcs/commands/Commands.cpp srcs/commands/join.cpp srcs/commands/kick.cpp srcs/commands/invite.cpp srcs/commands/pass.cpp srcs/commands/user.cpp srcs/commands/nick.cpp \
-	srcs/commands/Privmsg.cpp srcs/commands/cmdQuit.cpp
+	srcs/commands/privmsg.cpp srcs/commands/quit.cpp srcs/commands/topic.cpp srcs/commands/mode.cpp
 
 HEADER = includes/server.hpp includes/channels.cpp includes/client.cpp
 

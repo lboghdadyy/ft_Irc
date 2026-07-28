@@ -17,6 +17,7 @@ void Server::cmdJoin(int fd, std::vector<std::string> &params) {
         Channel newChannel(channelName, fd);
         channels.insert(std::make_pair(channelName, newChannel));
         it = channels.find(channelName);
+        it->second.addOperator(fd);
     } else {
         Channel &chan = it->second;
         if (!chan.getKey().empty() && chan.getKey() != key)

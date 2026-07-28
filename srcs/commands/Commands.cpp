@@ -54,11 +54,8 @@ void Server::handleCommand(int fd, std::string line) {
         cmdNick(fd, params);
     else if(Command == "USER")
         cmdUser(fd, params);
-
     else if(Command == "PRIVMSG")
         cmdPrivmsg(fd, params);
-    // else if(Command == "PING")
-    //     cmdPing(fd, params);
     else if(Command == "QUIT")
         cmdQuit(fd, params);
     if (Command == "JOIN")
@@ -67,10 +64,10 @@ void Server::handleCommand(int fd, std::string line) {
         cmdInvite(fd, params);
     else if(Command == "KICK")
         cmdKick(fd, params);
-    // else if(Command == "TOPIC") // ??
-        // cmdTopic(fd, params);
-    // else if(Command == "MODE")
-        // cmdMode(fd, params);
+    else if(Command == "TOPIC")
+        cmdTopic(fd, params);
+    else if(Command == "MODE")
+        cmdMode(fd, params);
 
     // ---- unknown ----
     // else

@@ -7,15 +7,15 @@
 
 class Channel {
     private:
-        std::string name;          // "#general" — identifies the channel
-        std::string topic;         // set by TOPIC command, shown to joiners
-        std::string key;           // password; empty string = no password
-        std::set<int> members;     // fds of everyone currently in the channel
-        std::set<int> operators;   // fds of members with op privileges (subset of members)
-        std::set<int> invited;     // fds invited (relevant only when inviteOnly is true)
-        bool inviteOnly;           // MODE +i
-        bool topicRestricted;      // MODE +t — only ops can change topic
-        size_t userLimit;          // MODE +l ; 0 = unlimited
+        std::string     name;          // "#general" — identifies the channel
+        std::string     topic;         // set by TOPIC command, shown to joiners
+        std::string     key;           // password; empty string = no password
+        std::set<int>   members;     // fds of everyone currently in the channel
+        std::set<int>   operators;   // fds of members with op privileges (subset of members)
+        std::set<int>   invited;     // fds invited (relevant only when inviteOnly is true)
+        bool            inviteOnly;           // MODE +i
+        bool            topicRestricted;      // MODE +t — only ops can change topic
+        size_t          userLimit;          // MODE +l ; 0 = unlimited
     public:
         Channel();
         Channel(std::string name, int creatorFd);
@@ -31,6 +31,7 @@ class Channel {
         void invite(int fd);
         bool isInvited(int fd) const;
         void removeInvite(int fd);   // clear invite once they've joined
+        void removeOperator(int fd);
 
         std::string getName() const;
         std::string getTopic() const;
@@ -42,6 +43,10 @@ class Channel {
         size_t getUserLimit() const;
         void setUserLimit(size_t n);
         std::set<int>& getMembers();
+        bool    getTopicRestrict(void);
+        void    setTopicRestrict(bool b);
+        int     getNumOpera(void);
+        void    assignNewOp(int fd);
 
         ~Channel();
 };

@@ -26,7 +26,8 @@ bool Channel::empty() const {
 }
 
 void Channel::addOperator(int fd) {
-    operators.insert(fd);
+    if (operators.find(fd) == operators.end())
+        operators.insert(fd);
 }
 bool Channel::isOperator(int fd) const {
     return operators.find(fd) != operators.end();
@@ -71,6 +72,30 @@ void Channel::setUserLimit(size_t n) {
 }
 std::set<int>& Channel::getMembers() {
     return members;
+}
+
+bool    Channel::getTopicRestrict(void) {
+    return topicRestricted;
+}
+
+void    Channel::setTopicRestrict(bool b) {
+    this->topicRestricted = b;
+}
+
+void    Channel::removeOperator(int fd) {
+    operators.erase(fd);
+}
+
+int     Channel::getNumOpera(void) {
+    return (operators.size());
+}
+
+void    Channel::assignNewOp(int fd) {
+    std::set<int>::iterator it = members.begin();
+    while (*it == fd) {
+        it++;
+    }
+    Channel::addOperator(*it);
 }
 
 Channel::~Channel() {}
