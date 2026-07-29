@@ -22,7 +22,7 @@ void Server::cmdKick(int fd, std::vector<std::string> &params) {
         return sendToClient(fd, "401 " + cls[fd].getNick() + " " + targetNick + " :No such nick/channel\r\n");
     if (!chan.isMember(targetFd))
         return sendToClient(fd, "441 " + cls[fd].getNick() + " " + channelName + " :They aren't on that channel\r\n");
-    std::string kickMsg = ":" + cls[fd].getNick() + "!user@" + cls[fd].getip() + " KICK " + channelName + " " + targetNick + " " + reason + "\r\n";
+    std::string kickMsg = ":" + cls[fd].getNick() + "!user@" + cls[fd].getip() + " KICK " + channelName + " " + targetNick + " :" + reason + "\r\n";
     std::set<int> &members = chan.getMembers();
     for (std::set<int>::iterator m = members.begin(); m != members.end(); ++m)
         sendToClient(*m, kickMsg);

@@ -15,6 +15,9 @@ void Channel::removeMember(int fd) {
     members.erase(fd);
     operators.erase(fd);
     invited.erase(fd);
+
+    if (!isOperator(fd) && !members.empty() && operators.empty())
+        assignNewOp(fd);
 }
 
 bool Channel::isMember(int fd) const {
@@ -91,6 +94,8 @@ int     Channel::getNumOpera(void) {
 }
 
 void    Channel::assignNewOp(int fd) {
+    if (members.empty())
+        return ;
     std::set<int>::iterator it = members.begin();
     while (*it == fd) {
         it++;

@@ -9,4 +9,6 @@ void    Server::cmdPass(int fd, std::vector<std::string> &params) {
     if (params[0] != pw)
         return sendToClient(fd, "464 " + cls[fd].getNick() + " :Password incorrect\r\n");
     cls[fd].setPassOk(true);
+    if (cls[fd].isRegistered())
+        sendToClient(fd, "001 " + cls[fd].getNick() + " :Welcome to the IRC server\r\n");
 }
