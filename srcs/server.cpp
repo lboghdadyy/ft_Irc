@@ -1,61 +1,52 @@
 #include "../includes/server.hpp"
 #include "../includes/channels.hpp"
 
-bool run = true;
+bool running = true;
 
 void    signalHandler(int sig)
 {
     (void)sig;
-    run = false;
+    running = false;
 }
 
-Server::Server() {}
+Server::Server() : ss(-1), port(0), epollFd(-1) {}
 
 Server::Server(const Server &x)
 {
     *this = x;
 }
 
-Server& Server::operator=(const Server &x) 
+Server& Server::operator=(const Server &x)
 {
     (void)x;
     return *this;
 }
 
-void    Server::Check(std::string port, std::string pass)
-{
-    if (port.empty())
-        throw std::runtime_error("port number cannot be empty\n");
-    if (pass.empty())
-        throw std::runtime_error("passeord cannot be empty\n");
-    if (port.find_first_not_of("0123456789") != std::string::npos)
-        throw (std::runtime_error("Port Number must be valid integer\n"));
-    long n = std::strtol(port.c_str(), NULL, 10);
-    if (n < 0 || n > 65535)
-        throw std::runtime_error("Port must be in [0, 65535]\n");
-    this->port = static_cast<int>(n);
-    pw = pass;
-}
-
-
-Server::Server(std::string p, std::string s)
+Server::Server(std::string p, std::string s) : ss(-1), port(0), epollFd(-1)
 {
     Check(p, s);
     ServSock();
-    std::cout<<"irc Server "<<ss<<" connetcted ...\n";
+    std::cout << "irc Server " << ss << " connected...\n";
     signal(SIGINT, signalHandler);
-    signal(SIGTERM, signalHandler);
     signal(SIGQUIT, signalHandler);
-    signal(SIGPIPE, SIG_IGN);
-    std::vector<struct epoll_event> evs(16);
-    while (run)
+    run();
+    std::cout << "\nIRC Server shutting down\n";
+}
+
+int    Server::run()
+{
+    std::vector<struct epoll_event> evs(64);
+    while (running)
     {
-        int n = epoll_wait(epollFd, evs.data(), 16, 420);
+        int n = epoll_wait(epollFd, evs.data(), evs.size(), -1);
         if (n < 0)
         {
-            if (errno == EINTR)
-            std::cerr<<"epoll_wait failed\n";
-            break;
+            if (errno != EINTR)
+            {
+                std::cerr << "epoll_wait failed\n";
+                break;
+            }
+            continue;
         }
         for (int i = 0; i < n; ++i)
         {
@@ -65,51 +56,38 @@ Server::Server(std::string p, std::string s)
             {
                 if (revs & EPOLLIN)
                     AccClient();
+                continue;
             }
-            else if (revs & (EPOLLHUP | EPOLLERR))
-                rmvClient(fd);
-            else
+            if (revs & (EPOLLHUP | EPOLLERR))
             {
-                if (revs & EPOLLIN)
-                {
-                    try
-                    {
-                        clientread(fd);
-                    }
-                    catch(const std::exception& e)
-                    {
-                        // if (e.what() == "quit") {
-                            rmvClient(fd);
-                            continue;
-                        // }
-                    }
-                }
-                if (revs & EPOLLOUT)
-                    clientwrite(fd);
+                rmvClient(fd);
+                continue;
             }
+            if (revs & EPOLLIN)
+            {
+                if (!clientread(fd))
+                    continue;
+            }
+            if (revs & EPOLLOUT)
+                clientwrite(fd);
         }
-        if (n == (int)evs.size())
+        if (n == static_cast<int>(evs.size()))
             evs.resize(evs.size() * 2);
     }
-    std::cout<<"irc server shariott shutting down\n";
-}
-
-void   Server::sendToClient(int fd, std::string msg)
-{
-    std::map<int, Client>::iterator i = cls.find(fd);
-    if (i == cls.end())
-        return;
-    i->second.getsend() += msg;
-    clearEpoll(fd, true);
+    return 0;
 }
 
 void    Server::AccClient()
 {
     struct sockaddr_in x;
     socklen_t len = sizeof(x);
+    std::memset(&x, 0, sizeof(x));
     int fd = accept(ss, (struct sockaddr*)&x, &len);
     if (fd < 0)
+    {
+        std::cerr<<"accept failed\n";
         return;
+    }
     if (fcntl(fd, F_SETFL, O_NONBLOCK) < 0)
     {
         std::cerr<<"fcntl failed\n";
@@ -117,6 +95,7 @@ void    Server::AccClient()
         return;
     }
     struct epoll_event evn;
+    std::memset(&evn, 0, sizeof(evn));
     evn.events = EPOLLIN;
     evn.data.fd = fd;
     if (epoll_ctl(epollFd, EPOLL_CTL_ADD, fd, &evn) < 0)
@@ -139,13 +118,11 @@ void Server::clientwrite(int fd)
     if (buff.empty())
     {
         clearEpoll(fd, false);
-        return ;
+        return;
     }
-    ssize_t r = send(fd, buff.c_str(), buff.size(),0);
-    if (r < 0)
+    ssize_t r = send(fd, buff.c_str(), buff.size(), 0);
+    if (r <= 0)
     {
-        if (errno == EAGAIN || errno == EWOULDBLOCK)
-            return;
         rmvClient(fd);
         return;
     }
@@ -154,54 +131,27 @@ void Server::clientwrite(int fd)
         clearEpoll(fd, false);
 }
 
-void Server::clearEpoll(int fd, bool x)
-{
-    struct epoll_event ev;
-    ev.data.fd = fd;
-    ev.events = EPOLLIN;
-    if (x)
-        ev.events = EPOLLIN | EPOLLOUT;
-    epoll_ctl(epollFd, EPOLL_CTL_MOD, fd, &ev);
-}
-
-void Server::clientread(int fd)
+int Server::clientread(int fd)
 {
     std::map<int, Client>::iterator i = cls.find(fd);
     if (i == cls.end())
-        return;
+        return 0;
     char buff[4096];
     ssize_t r = recv(fd, buff, sizeof(buff), 0);
-    if (r == 0)
+    if (r <= 0)
     {
         rmvClient(fd);
-        return;
-    }
-    if (r < 0)
-    {
-        if (errno == EAGAIN || errno == EWOULDBLOCK)
-            return;
-        rmvClient(fd);
-        return;
+        return 0;
     }
     i->second.getrecv().append(buff, r);
     pars(fd);
-}
-
-void Server::rmvClient(int fd)
-{
-    std::map<int, Client>::iterator i = cls.find(fd);
-    if (i == cls.end())
-        return ;
-    std::cout<<"client disconnected\n";
-    epoll_ctl(epollFd, EPOLL_CTL_DEL, fd, NULL);
-    removeFromAllChannels(fd);
-    close(fd);
-    cls.erase(fd);
+    return 1;
 }
 
 void Server::ServSock()
 {
     struct sockaddr_in x;
+    std::memset(&x, 0, sizeof(x));
     x.sin_family = AF_INET;
     x.sin_port = htons(port);
     x.sin_addr.s_addr = INADDR_ANY;
@@ -209,7 +159,8 @@ void Server::ServSock()
     if (ss < 0)
         throw std::runtime_error("socket creation failed\n");
     int op = 1;
-    setsockopt(ss, SOL_SOCKET, SO_REUSEADDR, &op, sizeof(op));
+    if (setsockopt(ss, SOL_SOCKET, SO_REUSEADDR, &op, sizeof(op)) < 0)
+        throw std::runtime_error("setsockopt failed\n");
     if (fcntl(ss, F_SETFL, O_NONBLOCK) < 0)
         throw std::runtime_error("fcntl failed\n");
     if (bind(ss, (struct sockaddr *)&x, sizeof(x)) < 0)
@@ -220,66 +171,19 @@ void Server::ServSock()
     if (epollFd < 0)
         throw std::runtime_error("epoll_create falied\n");
     struct epoll_event ev;
+    std::memset(&ev, 0, sizeof(ev));
     ev.events = EPOLLIN;
     ev.data.fd = ss;
     if (epoll_ctl(epollFd, EPOLL_CTL_ADD, ss, &ev) < 0)
         throw std::runtime_error("epoll_ctl failed\n");
 }
 
-int Server::findFdByNick(std::string nick) {
-    for (std::map<int, Client>::iterator i = cls.begin(); i != cls.end(); ++i) {
-        if (i->second.getNick() == nick)
-            return i->first;
-    }
-    return -1;
-}
-
-std::string Server::findNickByfd(int fd) {
-    std::map<int, Client>::iterator i = cls.begin();
-    while (i != cls.end())
-    {
-        if (i->second.getfd() == fd)
-            return (i->second.getNick());
-        i++;
-    }
-    throw (std::runtime_error(""));
-    return ("");
-}
-
-void Server::removeFromAllChannels(int fd) {
-    for (std::map<std::string, Channel>::iterator it = channels.begin(); it != channels.end(); ) {
-        it->second.removeMember(fd);
-        if (it->second.empty())
-            channels.erase(it++);
-        else
-            ++it;
-    }
-}
-
-void Server::pars(int fd) {
-    std::map<int, Client>::iterator i = cls.find(fd);
-    if (i == cls.end())
-        return;
-    std::string &buf = i->second.getrecv();
-    std::cout << buf;
-    size_t pos;
-    while ((pos = buf.find('\n')) != std::string::npos)
-    {
-        std::string line = buf.substr(0, pos);
-        buf.erase(0, pos + 1);
-        if (!line.empty() && line[line.size() - 1] == '\r')
-            line.erase(line.size() - 1);
-        if (!line.empty())
-            handleCommand(fd, line);
-    }
-}
-
 Server::~Server()
 {
     for (std::map<int, Client>::iterator i = cls.begin(); i != cls.end(); ++i)
         close(i->first);
-    if (ss)
+    if (ss >= 0)
         close(ss);
-    if (epollFd)
+    if (epollFd >= 0)
         close(epollFd);
 }

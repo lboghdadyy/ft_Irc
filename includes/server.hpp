@@ -14,19 +14,21 @@ class Server {
 		int epollFd;
 		std::string pw;
 		std::map <int, Client> cls;
+		Server(const Server &x);
+		Server& operator=(const Server &x);
 	public :
 		Server();
 		Server(std::string p, std::string s);
-		Server(const Server &x);
-		Server& operator=(const Server &x);
 		void	Check(std::string p, std::string s);
+		int		run();
 		void	ServSock();
 		void	AccClient();
 		void	rmvClient(int fd);
-		void	clientread(int fd);
+		int		clientread(int fd);
 		void	clientwrite(int fd);
 		void	clearEpoll(int fd, bool x);
 		void	sendToClient(int fd, std::string msg);
+
 		// what i add to Channels and my command parts
 		int		findFdByNick(std::string nick);
 		void	removeFromAllChannels(int fd);
@@ -42,7 +44,6 @@ class Server {
 		void	cmdTopic(int fd, std::vector<std::string> &params);
 		void    cmdMode(int fd, std::vector<std::string> &params);
 		void	pars(int fd);
-		// int     getClient(const std::string &_nick);
 		std::string						findNickByfd(int fd);
 		std::map<std::string, Channel>	channels;
 		~Server();
