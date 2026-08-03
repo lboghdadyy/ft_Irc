@@ -5,11 +5,17 @@
 #include <cerrno>
 #include <fcntl.h>
 #include <iostream>
+#include <stdlib.h>
+#include <sstream>
 #include <netinet/in.h>
 #include <sys/socket.h>
 #include <sys/types.h>
 #include <unistd.h>
+#include <vector>
 #include <arpa/inet.h>
+#include <cstdlib>
+#include <ctime>
+#include <algorithm>
 
 class Bot {
     private:
@@ -21,8 +27,9 @@ class Bot {
         std::string user;
         std::string channel;
         std::string recvBuff;
+        std::vector<std::string> funFacts;
         Bot(const Bot &x);
-        Bot() {};
+        Bot();
         Bot& operator=(const Bot &x);
     public:
         Bot(std::string &host, int port, std::string &pass, std::string &nick, std::string &channel);
@@ -31,6 +38,8 @@ class Bot {
         bool    connectToServer();
         bool    sendline(const std::string &x);
         bool    loop();
+        void    parseBuffer(const char *buffer);
+        void    sendFunFact(void);
         ~Bot();
 };
 

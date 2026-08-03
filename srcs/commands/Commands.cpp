@@ -42,7 +42,6 @@ void extractParams(std::string& rest, std::vector<std::string>& params) {
 void Server::handleCommand(int fd, std::string line) {
     std::string Command;
     std::string rest;
-    
     extractCommand(line, Command, rest);
     UpperCaseCommand(Command);
     std::vector<std::string> params;

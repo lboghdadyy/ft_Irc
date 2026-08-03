@@ -1,11 +1,20 @@
 # include "../../includes/server.hpp"
 # include "../../includes/channels.hpp"
 
+void    Server::sendMultClient(int fd, std::string nick, std::string message)
+{
+    int reciver = findFdByNick(nick);
+    if (reciver == -1)
+        return (sendToClient(fd, "401 " + cls[fd].getNick() + " " + nick + " :No such nick\n"));
+    sendToClient(reciver, ":" + nick + " PRIVMSG " + cls[fd].getNick() + " :" + message + '\n');
+}
+
 void    Server::cmdPrivmsg(int fd, std::vector<std::string> &arguments)
 {
     std::map<std::string, Channel>::iterator    it;
     std::set<int>                               _members;
-    std::string                                 _message;
+    std::string                                 users;
+
 
     if (!cls.find(fd)->second.isRegistered())
         return sendToClient(fd, "451 " + cls[fd].getNick() + " :You have not registered\r\n");
@@ -31,9 +40,8 @@ void    Server::cmdPrivmsg(int fd, std::vector<std::string> &arguments)
     }
     else
     {
-        int reciver = findFdByNick(arguments.at(0));
-        if (reciver == -1)
-            return (sendToClient(fd, "401 " + cls[fd].getNick() + " " + arguments[0] + " :No such nick\n"));
-        sendToClient(reciver, ":" + arguments[0] + " PRIVMSG " + cls[fd].getNick() + " :" + arguments[1] + '\n');
+        std::stringstream stringStream(arguments[0]);
+        while (getline(stringStream, users, ','))
+            sendMultClient(fd, users, arguments[1]);
     }
 }

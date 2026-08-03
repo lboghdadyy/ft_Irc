@@ -4,6 +4,7 @@
 class Channel;
 // # include "channels.hpp"
 #include "client.hpp"
+#include <cstring>
 #include <string>
 
 
@@ -40,6 +41,7 @@ class Server {
 		void	cmdUser(int fd, std::vector<std::string> &params);
 		void	cmdNick(int fd, std::vector<std::string> &params);
 		void	cmdPrivmsg(int fd, std::vector<std::string> &params);
+		void    sendMultClient(int fd, std::string nick, std::string message);
 		void	cmdQuit(int fd, std::vector<std::string> &params);
 		void	cmdTopic(int fd, std::vector<std::string> &params);
 		void    cmdMode(int fd, std::vector<std::string> &params);

@@ -1,4 +1,4 @@
-CPP = c++
+CXX = c++
 
 NAME = irc_bot
 
@@ -13,7 +13,7 @@ OBJ = $(SRC:.cpp=.o)
 all: $(NAME)
 
 $(NAME): $(OBJ)
-	$(CPP) $(CPPFLAGS) $(OBJ) -o $(NAME)
+	$(CXX) $(CPPFLAGS) $(OBJ) -o $(NAME)
 
 %.o: %.cpp bot.hpp
 	$(CXX) $(CPPFLAGS) -c $< -o $@

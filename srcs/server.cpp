@@ -144,7 +144,15 @@ int Server::clientread(int fd)
         return 0;
     }
     i->second.getrecv().append(buff, r);
-    pars(fd);
+    try
+    {
+        pars(fd);
+    }
+    catch(const std::exception& e)
+    {
+        rmvClient(fd);
+        return (0);
+    }
     return 1;
 }
 
