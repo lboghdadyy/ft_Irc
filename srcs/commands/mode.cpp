@@ -1,6 +1,17 @@
 # include "../../includes/server.hpp"
 # include "../../includes/channels.hpp"
 
+static int	checklimit(const std::string &input)
+{
+	for (std::string::const_iterator it = input.begin();
+		it != input.end();
+		it++)
+	{
+		if (!isdigit(*it))
+			return (1);
+	}
+	return (0);
+}
 
 void    Server::cmdMode(int fd, std::vector<std::string> &params)
 {
@@ -44,15 +55,12 @@ void    Server::cmdMode(int fd, std::vector<std::string> &params)
 					it->second.setTopicRestrict(false);
 				break;
 			case 'k':
-				if (params.size() < 1 + paramIndex)
+				if (sign == '+' && params.size() < 1 + paramIndex)
 					return (sendToClient(fd, "461 " + cls[fd].getNick() + " MODE :Not enough parameters\n"));
 				if (sign == '+')
 					it->second.setKey(params[paramIndex++]);
 				else
-				{
 					it->second.setKey("");
-					paramIndex++;
-				}
 				break;
 			case 'o':
 				if (params.size() < 1 + paramIndex)
@@ -72,7 +80,8 @@ void    Server::cmdMode(int fd, std::vector<std::string> &params)
 				{
 					if (params.size() < 1 + paramIndex)
 						return (sendToClient(fd, "461 " + cls[fd].getNick() + " MODE :Not enough parameters\n"));
-					it->second.setUserLimit(std::atoi(params[paramIndex++].c_str()));
+					if (!checklimit(params[paramIndex++].c_str()))
+						it->second.setUserLimit(std::stod(params[paramIndex++].c_str()));
 				}
 				else
 					it->second.setUserLimit(0);

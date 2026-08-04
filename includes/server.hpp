@@ -45,6 +45,7 @@ class Server {
 		void	cmdQuit(int fd, std::vector<std::string> &params);
 		void	cmdTopic(int fd, std::vector<std::string> &params);
 		void    cmdMode(int fd, std::vector<std::string> &params);
+		void	joinChannel(int fd, const std::string &channelName, const std::vector<std::string> &params, int &paramsIndex);
 		void	pars(int fd);
 		std::string						findNickByfd(int fd);
 		std::map<std::string, Channel>	channels;
