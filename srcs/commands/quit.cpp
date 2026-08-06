@@ -11,7 +11,7 @@ void    Server::cmdQuit(int fd, std::vector<std::string> &params)
 	if (params.empty())
 		params.push_back("");
 	if (!_client.isRegistered())
-		return sendToClient(fd, "451 " + cls[fd].getNick() + " :You have not registered\r\n");
+		return sendToClient(fd, ":ircserv 451 " + cls[fd].getNick() + " :You have not registered\r\n");
 	for (std::map<std::string, Channel>::iterator it = channels.begin();
 	 it != channels.end(); it++) {
 		if (it->second.isMember(fd)) {

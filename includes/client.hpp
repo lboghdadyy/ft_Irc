@@ -33,6 +33,7 @@ class Client {
         bool                        passOk;
         bool                        hasNick;
         bool                        hasUser;
+        bool                        welcomed;
     public :
         Client();
         Client(int f, std::string i);
@@ -50,6 +51,8 @@ class Client {
         bool        getPassOk() const;
         bool        getHasNick() const;
         bool        getHasUser() const;
+        bool        getWelcomed() const;
+        void        setWelcomed(bool w);
         void        setUser(std::string u);
         void        setRealname(std::string r);
         void        setPassOk(bool b);

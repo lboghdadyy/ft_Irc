@@ -1,4 +1,5 @@
 #include "../includes/server.hpp"
+#include "../includes/channels.hpp"
 
 Client::Client() {}
 
@@ -7,7 +8,7 @@ Client::Client(const Client &x)
     *this = x;
 }
 
-Client::Client(int f, std::string i) : fd(f), ip(i), passOk(false), hasNick(false), hasUser(false) {
+Client::Client(int f, std::string i) : fd(f), ip(i), passOk(false), hasNick(false), hasUser(false), welcomed(false) {
     std::stringstream ss;
     ss << "user" << f;
     std::string s = ss.str();
@@ -25,6 +26,7 @@ Client& Client::operator=(const Client &x)
         passOk = x.passOk;
         hasNick = x.hasNick;
         hasUser = x.hasUser;
+        welcomed = x.welcomed;
     }
     return *this;
 }
@@ -63,6 +65,14 @@ bool Client::getHasNick() const {
 bool Client::getHasUser() const {
     return hasUser;
 }
+
+bool Client::getWelcomed() const {
+    return welcomed;
+}
+void Client::setWelcomed(bool w) {
+    welcomed = w;
+}
+
 void Client::setUser(std::string u) {
     user = u;
 }

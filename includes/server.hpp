@@ -6,7 +6,7 @@ class Channel;
 #include "client.hpp"
 #include <cstring>
 #include <string>
-
+#include <ctime>
 
 class Server {
 	private :
@@ -31,6 +31,7 @@ class Server {
 		void	sendToClient(int fd, std::string msg);
 
 		// what i add to Channels and my command parts
+		void        sendWelcomeIfReady(int fd);
 		int		findFdByNick(std::string nick);
 		void	removeFromAllChannels(int fd);
 		void	handleCommand(int fd, std::string line);
@@ -45,7 +46,7 @@ class Server {
 		void	cmdQuit(int fd, std::vector<std::string> &params);
 		void	cmdTopic(int fd, std::vector<std::string> &params);
 		void    cmdMode(int fd, std::vector<std::string> &params);
-		void	joinChannel(int fd, const std::string &channelName, const std::vector<std::string> &params, int &paramsIndex);
+		void	joinChannel(int fd, const std::string &channelName, const std::string &key);
 		void	pars(int fd);
 		std::string						findNickByfd(int fd);
 		std::map<std::string, Channel>	channels;

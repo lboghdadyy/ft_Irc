@@ -49,3 +49,15 @@ void   Server::sendToClient(int fd, std::string msg)
     i->second.getsend() += msg;
     clearEpoll(fd, true);
 }
+
+void Server::sendWelcomeIfReady(int fd) {
+    if (cls[fd].isRegistered() && !cls[fd].getWelcomed()) {
+        std::time_t now = std::time(NULL);
+        std::string time = std::string(std::ctime(&now));
+        time.erase(time.find('\n'));
+        sendToClient(fd, ":ircserv 001 " + cls[fd].getNick() + " :Welcome to the IRC server\r\n");
+        sendToClient(fd, ":ircserv 002 " + cls[fd].getNick() + " :Your host is ircserv, running version 2.5\r\n");
+        sendToClient(fd, ":ircserv 003 " + cls[fd].getNick() + " :This server was created " + time + "\r\n");
+        cls[fd].setWelcomed(true);
+    }
+}
