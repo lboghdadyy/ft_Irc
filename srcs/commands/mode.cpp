@@ -13,6 +13,16 @@ static int	checklimit(const std::string &input)
 	return (0);
 }
 
+int	checkModes(const std::string &modes)
+{
+	for (std::string::const_iterator it = modes.begin(); it != modes.end(); it++)
+	{
+		if (std::isalpha(*it))
+			return (0);
+	}
+	return (1);
+}
+
 void    Server::cmdMode(int fd, std::vector<std::string> &params)
 {
 	int											modes;
@@ -25,6 +35,8 @@ void    Server::cmdMode(int fd, std::vector<std::string> &params)
 	paramIndex = 2;
 	if (params.size() < 2)
 		return (sendToClient(fd, "461 " + cls[fd].getNick() + " MODE :Not enough parameters\n"));
+	if (checkModes(params[1]))
+		return (sendToClient(fd, "461 " + cls[fd].getNick() + " MODE :Not enough parameters\n"));
 	it = channels.find(params[0]);
 	if (it == channels.end())
 		return sendToClient(fd, "403 " + cls[fd].getNick() + " " + params[0] + " :No such channel\n");
@@ -32,9 +44,9 @@ void    Server::cmdMode(int fd, std::vector<std::string> &params)
 		return (sendToClient(fd, "442 " + cls[fd].getNick() + " " + params[0] + " :You're not on that channel\n"));
 	if (!it->second.isOperator(fd))
 		return (sendToClient(fd, "482 " + cls[fd].getNick() + " " + params[0] + " :You're not channel operator\n"));
-	sign = params[1][0];
+	sign = '+';
 	modes = 0;
-	for (size_t index = 1; index < params[1].size(); index++)
+	for (size_t index = 0; index < params[1].size(); index++)
 	{
 		if (modes == 3)
 			return ;
@@ -65,11 +77,12 @@ void    Server::cmdMode(int fd, std::vector<std::string> &params)
 			case 'o':
 				if (params.size() < 1 + paramIndex)
 					return (sendToClient(fd, "461 " + cls[fd].getNick() + " MODE :Not enough parameters\n"));
-				_targetFd = findFdByNick(params[paramIndex++]);
+				_targetFd = findFdByNick(params[paramIndex]);
 				if (_targetFd == -1)
 					return sendToClient(fd, "401 " + cls[fd].getNick() + " " + params[paramIndex] + " :No such nick/channel\r\n");
 				if (!it->second.isMember(_targetFd))
 					return sendToClient(fd, "441 " + cls[fd].getNick() + " " + params[paramIndex] + " " + params[0] + " :They aren't on that channel\r\n");
+				paramIndex++;
 				if (sign == '+')
 					it->second.addOperator(_targetFd);
 				else

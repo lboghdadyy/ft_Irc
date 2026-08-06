@@ -1,5 +1,8 @@
 CXX = c++
 
+GREEN:=\033[0;32m
+YELLOW := \033[0;33m
+
 NAME = ircserv
 
 CXXFLAGS = -Wall -Wextra -Werror 
@@ -17,16 +20,20 @@ OBJ = $(SRC:.cpp=.o)
 all: $(NAME)
 
 $(NAME): $(OBJ)
-	$(CXX) $(OBJ) -fsanitize=address -o $(NAME) 
+	@$ $(CXX) $(OBJ) -fsanitize=address -o $(NAME)
+	@echo "$(GREEN)IRC serever built successfully ."
+	
 
 %.o: %.cpp $(HEADER)
-	$(CXX) $(CXXFLAGS) -c $< -o $@
-
+	@$ $(CXX) $(CXXFLAGS) -c $< -o $@
+	
 clean:
-	$(RM) $(OBJ)
+	@$ $(RM) $(OBJ)
+	@echo "$(YELLOW)object files were removed."
 
 fclean: clean
-	$(RM) $(NAME)
+	@$ $(RM) $(NAME)
+	@echo "$(YELLOW)IRC program and object files were removed."
 
 re : fclean all
 

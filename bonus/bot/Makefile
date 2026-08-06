@@ -17,6 +17,7 @@ $(NAME): $(OBJ)
 
 %.o: %.cpp bot.hpp
 	$(CXX) $(CPPFLAGS) -c $< -o $@
+	
 
 clean:
 	$(RM) $(OBJ)

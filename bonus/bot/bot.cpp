@@ -59,6 +59,7 @@ void    initFacts(std::vector<std::string> &funFacts)
     funFacts.push_back("The Sun contains about 99.8% of the Solar System's mass.");
     funFacts.push_back("A crocodile cannot stick its tongue out.");
     funFacts.push_back("Humans are the only animals that blush.");
+    funFacts.push_back("Your mom is not a hocker ; a hocker do it for money, your mom is doing it for free.");
     funFacts.push_back("The shortest complete sentence in English is 'I am.'");
     funFacts.push_back("A day on Mercury lasts about 176 Earth days.");
     funFacts.push_back("The world's oldest known pet cat lived over 9,000 years ago.");
