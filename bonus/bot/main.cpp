@@ -12,13 +12,13 @@ int main(int ac, char **av)
 {
     if (ac < 4 || ac > 6)
     {
-        std::cerr << "Usage: ./irc_bot <host> <port> <password> <nickname> <channel>\n";
+        std::cerr << "Usage: ./irc_bot <host> <port> <password> <nickname> <channel>" << std::endl;
         return 1;
     }
     int port = atoi(av[2]);
     if (port <= 0 || port > 65535)
     {
-        std::cerr << "Bot : Invalid Port\n";
+        std::cerr << "Bot : Invalid Port" << std::endl;
         return 1;
     }
     std::string host = av[1];
@@ -27,12 +27,12 @@ int main(int ac, char **av)
     std::string channel = (ac >= 6 ? av[5] : "#general");
     if (checkNick(nickname))
     {
-        std::cerr << "Bot : invalid nickname";
+        std::cerr << "Bot : invalid nickname" << std::endl;
         return (1);
     }
     if (channel.empty() || channel[0] != '#')
     {
-        std::cerr << "Bot : channel must start with #\n";
+        std::cerr << "Bot : channel must start with #" << std::endl;
         return 1;
     }
     Bot bot(host, port, password, nickname, channel);

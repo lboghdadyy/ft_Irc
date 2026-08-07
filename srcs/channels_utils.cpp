@@ -37,7 +37,6 @@ void Server::removeFromAllChannels(int fd)
 void Server::pars(int fd) {
     std::map<int, Client>::iterator i = cls.find(fd);
     std::string &buf = i->second.getrecv();
-    // std::cout << buf;
     size_t pos;
     while ((pos = buf.find('\n')) != std::string::npos)
     {

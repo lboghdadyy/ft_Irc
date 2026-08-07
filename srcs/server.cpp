@@ -39,17 +39,11 @@ int    Server::run()
     while (running)
     {
         int n = epoll_wait(epollFd, evs.data(), evs.size(), -1);
-        if (n < 0)
-        {
-            if (errno != EINTR)
-            {
-                std::cerr << "epoll_wait failed\n";
-                break;
-            }
-            continue;
+        if (n < 0) {
+            std::cerr << "epoll_wait failed\n";
+            break;
         }
-        for (int i = 0; i < n; ++i)
-        {
+        for (int i = 0; i < n; ++i) {
             int fd = evs[i].data.fd;
             int revs = evs[i].events;
             if (fd == ss)
@@ -106,7 +100,7 @@ void    Server::AccClient()
     }
     std::string ip = inet_ntoa(x.sin_addr);
     cls.insert(std::make_pair(fd, Client(fd, ip)));
-    std::cout<<"New client connected fd = "<<fd<<" ip= "<<ip<<std::endl;
+    std::cout<<"New client connected fd = "<<fd<<" ip = "<<ip<<std::endl;
 }
 
 void Server::clientwrite(int fd)

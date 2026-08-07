@@ -105,7 +105,7 @@ bool    Bot::sendline(const std::string &x)
     {
         if (errno == EAGAIN || errno == EWOULDBLOCK)
             return true;
-        std::cerr<<"Bot : send() failed\n";
+        std::cerr<<"Bot : send() failed" << std::endl;
         return false;
     }
     return true;
@@ -169,8 +169,8 @@ void    Bot::parseBuffer(const char *buffer)
 bool    Bot::loop()
 {
 
-    std::cout<<"Bot is running ...\n";
-    std::cout<<"Bot commands: !fact, !tiki\n";
+    std::cout<<"Bot is running ..." << std::endl;
+    std::cout<<"Bot commands: !fact" << std::endl;
 
     char buff[4096];
     while (1)
@@ -178,12 +178,12 @@ bool    Bot::loop()
         ssize_t r = recv(sfd, buff, sizeof(buff), 0);
         if (r == 0)
         {
-            std::cerr << "Bot : server closed connection\n";
+            std::cerr << "Bot : server closed connection" << std::endl;
             return false;
         }
         if (r < 0)
         {
-            std::cerr << "Bot : recv() failed\n";
+            std::cerr << "Bot : recv() failed" << std::endl;
             return false;
         }
         recvBuff.append(buff, r);
@@ -206,21 +206,20 @@ bool Bot::run()
     x.sin_addr.s_addr = inet_addr(host.c_str());
     if (x.sin_addr.s_addr == INADDR_NONE)
     {
-        std::cerr<<"Bot : host must be a valid IPv4 address\n";
+        std::cerr<<"Bot : host must be a valid IPv4 address" << std::endl;
         return false;
     }
     sfd = socket(AF_INET, SOCK_STREAM, 0);
-    if (sfd < 0)
-    {
-        std::cerr<<"Bot : socket failed\n";
+    if (sfd < 0) {
+        std::cerr<<"Bot : socket failed" << std::endl;
         return false;
     }
     if (connect(sfd, (struct sockaddr *)&x, sizeof(x)) < 0)
     {
-        std::cerr<<"Bot : connect() failed\n";
+        std::cerr<<"Bot : connect() failed" << std::endl;
         return false;
     }
-    std::cout << "Bot: connected to " <<host<<std::endl;
+    std::cout << "Bot: connected to " << host<<std::endl;
     auth();
     return loop();
 }
@@ -229,5 +228,5 @@ Bot::~Bot()
 {
     if (sfd >= 0)
         close(sfd);
-    std::cout<<"Bot disconnected\n";
+    std::cout<<"Bot disconnected" << std::endl;
 }
