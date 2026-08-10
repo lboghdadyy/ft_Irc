@@ -5,7 +5,7 @@ YELLOW := \033[0;33m
 
 NAME = ircserv
 
-CXXFLAGS = -Wall -Wextra -Werror 
+CXXFLAGS = -Wall -Wextra -Werror -std=c++98
 
 RM = rm -rf
 

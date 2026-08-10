@@ -58,6 +58,7 @@ void Server::sendWelcomeIfReady(int fd) {
         sendToClient(fd, ":ircserv 001 " + cls[fd].getNick() + " :Welcome to the IRC server\r\n");
         sendToClient(fd, ":ircserv 002 " + cls[fd].getNick() + " :Your host is ircserv, running version 2.5\r\n");
         sendToClient(fd, ":ircserv 003 " + cls[fd].getNick() + " :This server was created " + time + "\r\n");
-        cls[fd].setWelcomed(true);
+        if (cls[fd].getPassOk() == true)
+            cls[fd].setWelcomed(true);
     }
 }

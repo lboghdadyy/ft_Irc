@@ -94,7 +94,7 @@ void    Server::cmdMode(int fd, std::vector<std::string> &params)
 					if (params.size() < 1 + paramIndex)
 						return (sendToClient(fd, ":ircserv 461 " + cls[fd].getNick() + " MODE :Not enough parameters\n"));
 					if (!checklimit(params[paramIndex++].c_str()))
-						it->second.setUserLimit(std::stod(params[paramIndex++].c_str()));
+						it->second.setUserLimit(std::strtod(params[paramIndex++].c_str(), NULL));
 				}
 				else
 					it->second.setUserLimit(0);

@@ -6,8 +6,10 @@ void    Server::cmdPass(int fd, std::vector<std::string> &params) {
         return sendToClient(fd, ":ircserv 462 " + cls[fd].getNick() + " :You may not reregister\r\n");
     if (params.empty())
         return sendToClient(fd, ":ircserv 461 " + cls[fd].getNick() + " PASS :Not enough parameters\r\n");
-    if (params[0] != pw)
+    if (params[0] != pw) {
+        cls[fd].setPassOk(false);
         return sendToClient(fd, ":ircserv 464 " + cls[fd].getNick() + " :Password incorrect\r\n");
+    }
     cls[fd].setPassOk(true);
     sendWelcomeIfReady(fd);
 }
